@@ -1,0 +1,24 @@
+{
+    "name": "trevoserver",
+    "version": "1.0.0",
+    "description": "Server for Trevo",
+    "main": "index.js",
+    "scripts": {
+        "start": "node index",
+        "dev": "nodemon index"
+    },
+    "author": "Yash Sharma",
+    "license": "ISC",
+    "dependencies": {
+        "axios": "^0.21.0",
+        "body-parser": "^1.19.0",
+        "cheerio": "^1.0.0-rc.3",
+        "deasync": "^0.1.20",
+        "express": "^4.17.1",
+        "request": "^2.88.2"
+    },
+    "devDependencies": {
+        "dotenv": "^8.2.0",
+        "nodemon": "^2.0.6"
+    }
+}
