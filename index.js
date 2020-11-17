@@ -126,7 +126,7 @@ app.post('/webhook', (req, res) => {
         axios
             .get(url)
             .then(result => {
-                let wet = city_name + ' is a good choice! The temprature is approximately ' + KelvinToCelcius(result.data.main.temp).toString() +
+                let wet = city_name + ' is a good choice! The temperature is approximately ' + KelvinToCelcius(result.data.main.temp).toString() +
                     " degree celcius over there, pack your belongings accordingly. When do you plan to start the trip?";
 
                 let responseObject = {
@@ -216,7 +216,7 @@ app.post('/webhook', (req, res) => {
                                                 }
                                             }
 
-                                            let custom_flight_response = "Here are some details:\nCarrier-" + myCarrierName + ", flightNumber-" + flightCode + " with " + stops + " stops is the fastest flight for date: " + d + "\nTo book and look for more details visit: " + mmtFlightUrl +
+                                            let custom_flight_response = "Here are some details:\nCarrier-" + myCarrierName + ", flightNumber-" + flightCode + " with " + stops + " stops is the fastest flight for date: " + d + "\nTo book and look for more details visit: ```" + mmtFlightUrl + '```' +
                                                 ', would you like me to configure a trip for you?';
                                             console.log(custom_flight_response);
 
@@ -228,8 +228,8 @@ app.post('/webhook', (req, res) => {
                                             res.send(responseObject);
                                         } catch (err) {
 
-                                            let custom_flight_response = "Here are some details:\n" + 'Uh Oh! There are not many fast flights for your query on date: ' + d + "\nTo book and look for more details visit: " + mmtFlightUrl +
-                                                ' would you like me to configure a trip for you?';
+                                            let custom_flight_response = "Here are some details:\n" + 'Uh Oh! There are not many fast flights for your query on date: ' + d + "\nTo book and look for more details visit: ```" + mmtFlightUrl + '```'
+                                            ' would you like me to configure a trip for you?';
 
                                             let responseObject = {
                                                 "fulfillmentText": "",
@@ -309,11 +309,11 @@ app.post('/webhook', (req, res) => {
                         let finalPlacesJSON = { 'totalCount': q, 'cityName': toCity, 'places': placesList };
 
                         var message = 'This is what I\'ve configured for your trip to ' + toCity + ' on ' + finalDate + ' :' +
-                            '\nPlaces to visit:\n' + JSON.stringify(finalPlacesJSON) +
-                            '\nMore places to visit: ' + placesUrl +
-                            '\nBrowse some good hotel links as well: ' + hotelsUrl +
-                            '\nYou can also browse custom travel packages from our partners here: ' + linkToPlans +
-                            '\nFuthermore suggested activities can be found here: ' + linkToActivities +
+                            '\nPlaces to visit:\n ~~~' + JSON.stringify(finalPlacesJSON) + '~~~' +
+                            '\nMore places to visit: ```' + placesUrl + '```' +
+                            '\nBrowse some good hotel links as well: ```' + hotelsUrl + '```' +
+                            '\nYou can also browse custom travel packages from our partners here: ```' + linkToPlans + '```' +
+                            '\nFuthermore suggested activities can be found here: ```' + linkToActivities + '```' +
                             '\nAlso I\'ll keep you updated with good restaraunts as you travel.';
 
                         console.log(message);
