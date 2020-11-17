@@ -230,8 +230,7 @@ app.post('/webhook', (req, res) => {
             var z = values[i].name;
             if (z.match(regex)) {
                 var params = values[i].parameters;
-                var fromCity = params.from;
-                var toCity = params["geo-city1"];
+                var toCity = params.from;
                 var date = params["date-time"];
                 let dateList = date.split("T")[0].split("-");
                 var finalDate = dateList[2] + "/" + dateList[1] + "/" + dateList[0];
