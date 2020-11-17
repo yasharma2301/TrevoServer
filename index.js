@@ -130,8 +130,8 @@ app.post('/webhook', (req, res) => {
                     " degree celcius over there, pack your belongings accordingly. When do you plan to start the trip?";
 
                 let responseObject = {
-                    "fullfillmentText": "",
-                    "fullfillmentMessages": [{ "text": { "text": [wet] } }],
+                    "fulfillmentText": "",
+                    "fulfillmentMessages": [{ "text": { "text": [wet] } }],
                     "source": "",
                 }
                 res.send(responseObject);
@@ -221,8 +221,8 @@ app.post('/webhook', (req, res) => {
                                             console.log(custom_flight_response);
 
                                             let responseObject = {
-                                                "fullfillmentText": "",
-                                                "fullfillmentMessages": [{ "text": { "text": [custom_flight_response] } }],
+                                                "fulfillmentText": "",
+                                                "fulfillmentMessages": [{ "text": { "text": [custom_flight_response] } }],
                                                 "source": "",
                                             }
                                             res.send(responseObject);
@@ -232,16 +232,16 @@ app.post('/webhook', (req, res) => {
                                                 ' would you like me to configure a trip for you?';
 
                                             let responseObject = {
-                                                "fullfillmentText": "",
-                                                "fullfillmentMessages": [{ "text": { "text": [custom_flight_response] } }],
+                                                "fulfillmentText": "",
+                                                "fulfillmentMessages": [{ "text": { "text": [custom_flight_response] } }],
                                                 "source": "",
                                             }
                                             res.send(responseObject);
                                         }
                                     }).catch(err => {
                                         let responseObject = {
-                                            "fullfillmentText": "",
-                                            "fullfillmentMessages": [{ "text": { "text": [err] } }],
+                                            "fulfillmentText": "",
+                                            "fulfillmentMessages": [{ "text": { "text": [err] } }],
                                             "source": "",
                                         }
                                         console.log(err);
@@ -339,8 +339,8 @@ app.post('/webhook', (req, res) => {
                                     '\nFuthermore suggested activities can be found here: ' + linkToActivities;
 
                                 let responseObject = {
-                                    "fullfillmentText": "",
-                                    "fullfillmentMessages": [{ "text": { "text": [message] } }],
+                                    "fulfillmentText": "",
+                                    "fulfillmentMessages": [{ "text": { "text": [message] } }],
                                     "source": "",
                                 }
                                 res.send(responseObject);
@@ -348,8 +348,8 @@ app.post('/webhook', (req, res) => {
                             }).catch(err => {
 
                                 let responseObject = {
-                                    "fullfillmentText": "",
-                                    "fullfillmentMessages": [{ "text": { "text": [{ 'errorMessage': err }] } }],
+                                    "fulfillmentText": "",
+                                    "fulfillmentMessages": [{ "text": { "text": [{ 'errorMessage': err }] } }],
                                     "source": "",
                                 }
                                 res.send(responseObject);
@@ -357,8 +357,8 @@ app.post('/webhook', (req, res) => {
                             });
                     }).catch(err => {
                         let responseObject = {
-                            "fullfillmentText": "",
-                            "fullfillmentMessages": [{ "text": { "text": [{ 'errorMessage': err }] } }],
+                            "fulfillmentText": "",
+                            "fulfillmentMessages": [{ "text": { "text": [{ 'errorMessage': err }] } }],
                             "source": "",
                         }
                         res.send(responseObject);
