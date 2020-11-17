@@ -127,7 +127,7 @@ app.post('/webhook', (req, res) => {
             .get(url)
             .then(result => {
                 let wet = city_name + ' is a good choice! The temprature is approximately ' + KelvinToCelcius(result.data.main.temp).toString() +
-                    " degree celcius, pack your belongings accordingly. When do you plan to start the trip?";
+                    " degree celcius over there, pack your belongings accordingly. When do you plan to start the trip?";
 
                 let responseObject = {
                     "fullfillmentText": "",
@@ -147,9 +147,10 @@ app.post('/webhook', (req, res) => {
             var z = values[i].name;
             if (z.match(regex)) {
                 var params = values[i].parameters;
-                var fromCity = params.from;
-                var toCity = params["geo-city1"];
+                var fromCity = params["geo-city1"];
+                var toCity = params.from;
                 var date = params["date-time"];
+
 
                 var fromCityCodeUrl = "https://www.air-port-codes.com/api/v1/multi?term=" + fromCity;
                 var toCityCodeUrl = "https://www.air-port-codes.com/api/v1/multi?term=" + toCity;
@@ -165,7 +166,14 @@ app.post('/webhook', (req, res) => {
                     }
                 }).then(result => {
                     if (result.data.statusCode == 200) {
-                        let fromCityCode = result.data.airports[0].iata;
+
+                        let plF = result.data.airports[0];
+                        var fromCityCode;
+                        if (plF.name.match(/All Airports$/)) {
+                            fromCityCode = result.data.airports[1].iata;
+                        } else {
+                            fromCityCode = result.data.airports[0].iata;
+                        }
 
                         axios({
                             method: 'post',
@@ -176,44 +184,68 @@ app.post('/webhook', (req, res) => {
                             }
                         }).then(result2 => {
                             if (result2.data.statusCode == 200) {
-                                let toCityCode = result2.data.airports[0].iata;
+                                let pl = result2.data.airports[0];
+                                var toCityCode;
+                                if (pl.name.match(/All Airports$/)) {
+                                    toCityCode = result2.data.airports[1].iata;
+                                } else {
+                                    toCityCode = result2.data.airports[0].iata;
+                                }
+
+
                                 let flightQuery = fromCityCode + "-" + toCityCode + "-" + finalDate;
                                 let mmtFlightUrl = "https://www.makemytrip.com/flight/search?itinerary=" + flightQuery + "&tripType=O&paxType=A-1_C-0_I-0&intl=false&cabinClass=E"
-
                                 let dl = date.split("T")[0].split("-");
                                 let d = dl[0] + '/' + dl[1] + '/' + dl[2]
 
                                 let flightSchedulesApi = "https://api.flightstats.com/flex/schedules/rest/v1/json/from/" + fromCityCode + "/to/" + toCityCode + "/arriving/" + d + "?appId=0762d25d&appKey=7662340eba0c099522f827941ed712ac";
-
+                                console.log(flightSchedulesApi);
                                 axios.get(flightSchedulesApi)
                                     .then(scheduleRes => {
-                                        let scheduleBody = scheduleRes.data;
-                                        let carrierCode = scheduleBody.scheduledFlights[0].carrierFsCode;
-                                        let flightCode = scheduleBody.scheduledFlights[0].flightNumber;
-                                        let stops = scheduleBody.scheduledFlights[0].stops;
-                                        let allCarriers = scheduleBody.appendix.airlines;
-                                        let myCarrierName;
-                                        var k;
-                                        for (k = 0; k < allCarriers.length; k++) {
-                                            if (allCarriers[k].fs == carrierCode) {
-                                                myCarrierName = allCarriers[k].name;
+                                        try {
+                                            let scheduleBody = scheduleRes.data;
+                                            let carrierCode = scheduleBody.scheduledFlights[0].carrierFsCode;
+                                            let flightCode = scheduleBody.scheduledFlights[0].flightNumber;
+                                            let stops = scheduleBody.scheduledFlights[0].stops;
+                                            let allCarriers = scheduleBody.appendix.airlines;
+                                            let myCarrierName;
+                                            var k;
+                                            for (k = 0; k < allCarriers.length; k++) {
+                                                if (allCarriers[k].fs == carrierCode) {
+                                                    myCarrierName = allCarriers[k].name;
+                                                }
                                             }
-                                        }
 
-                                        let custom_flight_response = "Here are some details:\nCarrier-" + myCarrierName + ", flightNumber-" + flightCode + " with " + stops + " stops is the fastest flight for date: " + d + "\nTo book and look for more details visit: " + mmtFlightUrl +
-                                            ' would you like me to configure a trip for you?';
-                                        let responseObject = {
-                                            "fullfillmentText": "",
-                                            "fullfillmentMessage": [{ "text": { "text": [custom_flight_response] } }],
-                                            "source": "",
+                                            let custom_flight_response = "Here are some details:\nCarrier-" + myCarrierName + ", flightNumber-" + flightCode + " with " + stops + " stops is the fastest flight for date: " + d + "\nTo book and look for more details visit: " + mmtFlightUrl +
+                                                ', would you like me to configure a trip for you?';
+                                            console.log(custom_flight_response);
+
+                                            let responseObject = {
+                                                "fullfillmentText": "",
+                                                "fullfillmentMessage": [{ "text": { "text": [custom_flight_response] } }],
+                                                "source": "",
+                                            }
+                                            res.send(responseObject);
+                                        } catch (err) {
+
+                                            let custom_flight_response = "Here are some details:\n" + 'Uh Oh! There are not many fast flights for your query on date: ' + d + "\nTo book and look for more details visit: " + mmtFlightUrl +
+                                                ' would you like me to configure a trip for you?';
+
+                                            let responseObject = {
+                                                "fullfillmentText": "",
+                                                "fullfillmentMessage": [{ "text": { "text": [custom_flight_response] } }],
+                                                "source": "",
+                                            }
+                                            res.send(responseObject);
                                         }
-                                        res.send(responseObject);
                                     }).catch(err => {
                                         let responseObject = {
                                             "fullfillmentText": "",
                                             "fullfillmentMessage": [{ "text": { "text": [err] } }],
                                             "source": "",
                                         }
+                                        console.log(err);
+
                                         res.send(responseObject);
                                     });
                             }
