@@ -276,85 +276,56 @@ app.post('/webhook', (req, res) => {
                     .then(urlRes => {
                         let placesList = [];
                         const $ = cheerio.load(urlRes.data);
-                        $('.card.content-card.animation-slide-up').each((index, el) => {
-                            const placeName = $(el).find('.card-heading').text().split('.');
-                            let placeNameFinal = "";
-                            var i;
-                            for (i = 1; i < placeName.length; i++) {
-                                placeNameFinal += placeName[i];
-                            }
-                            const distance = $(el).find('p.objective').text().match(/[0-9]+ km/);
-                            const placeDetails = $(el).find('.card-text').text();
-                            const readMoreLink = $(el).find('.btn.btn-read-more.mr-auto').attr('onclick');
-                            const photo = $(el).find('.card-img-top.lazy').attr('data-original');
-                            let placeMap = {
-                                'index': index + 1,
-                                'attractionName': placeNameFinal.trim(),
-                                'distance': distance + ' from city center',
-                                'description': placeDetails.trim(),
-                                'readMore': readMoreLink.substring(10, readMoreLink.length - 2),
-                                'picture': photo.trim()
-                            }
-                            placesList.push(placeMap);
-                        });
-                        let finalPlacesJSON = { 'totalCount': 2, 'cityName': toCity, 'places': placesList.slice(0, 2) };
-
-
-                        axios.get(hotelsUrl)
-                            .then(urlRes => {
-                                let hotels = [];
-                                const $ = cheerio.load(urlRes.data);
-                                $('.row.no-gutters.mb-3.hotel-card').each((index, el) => {
-                                    const hotelName = $(el).find('.hotel-name.mt-md-3.hotel-line-margin.noMargin').text();
-                                    const distance = $(el).find('.distance').text();
-                                    let hotelPictures = [];
-                                    $(el).find('.lazyBG.swipe-image.p-0.m-0').each((elementIndex, picElement) => {
-                                        const pic = $(picElement).attr('data-original');
-                                        hotelPictures.push(pic);
-                                    })
-                                    const price = $(el).find('.price').text();
-                                    const viewDeal = $(el).find('.btn.btn-read-more.btn-sm-hotel').attr('onclick');
-                                    let viewDealLink;
-                                    try {
-                                        viewDealLink = viewDeal.match(/"([^"]*)"/)[0].substring(1, viewDeal.match(/"([^"]*)"/)[0].length - 1);
-                                    } catch (error) {
-                                        viewDealLink = "";
-                                    }
-                                    let hoteMap = {
-                                        'index': index + 1,
-                                        'hotelName': hotelName,
-                                        'distance': distance.trim(),
-                                        'pictures': hotelPictures,
-                                        'price': price.trim(),
-                                        'viewDealLink': viewDealLink
-                                    }
-                                    hotels.push(hoteMap);
-                                });
-                                const finalHotelsJSON = { 'totalCount': 2, 'cityName': toCity, 'places': hotels.slice(0, 2) };
-
-                                var message = 'This is what I\'ve configured for your trip to ' + toCity + ' on ' + finalDate + ' :' +
-                                    '\nPlaces to visit:\n' + JSON.stringify(finalHotelsJSON) + '\n' + placesUrl + '\nHotels to stay at:\n' +
-                                    JSON.stringify(finalPlacesJSON) + '\n' + hotelsUrl +
-                                    '\nYou can also browse custom travel packages from our partners here: ' + linkToPlans +
-                                    '\nFuthermore suggested activities can be found here: ' + linkToActivities;
-
-                                let responseObject = {
-                                    "fulfillmentText": "",
-                                    "fulfillmentMessages": [{ "text": { "text": [message] } }],
-                                    "source": "",
+                        const all_divs = $('.card.content-card.animation-slide-up');
+                        var q;
+                        try {
+                            for (q = 0; q < 3; q++) {
+                                const el = $(all_divs[q]);
+                                const placeName = el.find('.card-heading').text().split('.');
+                                let placeNameFinal = "";
+                                var i;
+                                for (i = 1; i < placeName.length; i++) {
+                                    placeNameFinal += placeName[i];
                                 }
-                                res.send(responseObject);
-
-                            }).catch(err => {
-
-                                let responseObject = {
-                                    "fulfillmentText": "",
-                                    "fulfillmentMessages": [{ "text": { "text": [{ 'errorMessage': err }] } }],
-                                    "source": "",
+                                const distance = el.find('p.objective').text().match(/[0-9]+ km/);
+                                const placeDetails = el.find('.card-text').text();
+                                const readMoreLink = el.find('.btn.btn-read-more.mr-auto').attr('onclick');
+                                const photo = el.find('.card-img-top.lazy').attr('data-original');
+                                let placeMap = {
+                                    'index': q + 1,
+                                    'attractionName': placeNameFinal.trim(),
+                                    'distance': distance + ' from city center',
+                                    'description': placeDetails.trim(),
+                                    'readMore': readMoreLink.substring(10, readMoreLink.length - 2),
+                                    'picture': photo.trim()
                                 }
-                                res.send(responseObject);
+                                placesList.push(placeMap);
 
-                            });
+                            }
+                        } catch (err) {
+                            console.log(err);
+
+                        }
+                        let finalPlacesJSON = { 'totalCount': q, 'cityName': toCity, 'places': placesList };
+
+                        var message = 'This is what I\'ve configured for your trip to ' + toCity + ' on ' + finalDate + ' :' +
+                            '\nPlaces to visit:\n' + JSON.stringify(finalPlacesJSON) +
+                            '\nMore places to visit: ' + placesUrl +
+                            '\nBrowse some good hotel links as well: ' + hotelsUrl +
+                            '\nYou can also browse custom travel packages from our partners here: ' + linkToPlans +
+                            '\nFuthermore suggested activities can be found here: ' + linkToActivities +
+                            '\nAlso I\'ll keep you updated with good restaraunts as you travel.';
+
+                        console.log(message);
+
+                        let responseObject = {
+                            "fulfillmentText": "",
+                            "fulfillmentMessages": [{ "text": { "text": [message] } }],
+                            "source": "",
+                        }
+                        res.send(responseObject);
+
+
                     }).catch(err => {
                         let responseObject = {
                             "fulfillmentText": "",
@@ -363,8 +334,6 @@ app.post('/webhook', (req, res) => {
                         }
                         res.send(responseObject);
                     });
-
-
             }
         }
     }
