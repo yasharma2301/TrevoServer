@@ -200,7 +200,8 @@ app.post('/webhook', (req, res) => {
                                             }
                                         }
 
-                                        let custom_flight_response = "Here are some details:\nCarrier-" + myCarrierName + ", flightNumber-" + flightCode + " with " + stops + " stops is the fastest flight for date: " + d + "\nTo book and look for more details visit: " + mmtFlightUrl;
+                                        let custom_flight_response = "Here are some details:\nCarrier-" + myCarrierName + ", flightNumber-" + flightCode + " with " + stops + " stops is the fastest flight for date: " + d + "\nTo book and look for more details visit: " + mmtFlightUrl +
+                                            ' would you like me to configure a trip for you?';
                                         let responseObject = {
                                             "fullfillmentText": "",
                                             "fullfillmentMessage": [{ "text": { "text": [custom_flight_response] } }],
