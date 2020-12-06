@@ -246,8 +246,8 @@ app.post('/webhook', (req, res) => {
                                             res.send(responseObject);
                                         } catch (err) {
 
-                                            let custom_flight_response = "Here are some details:\n" + 'Uh Oh! There are not many fast flights for your query on date: ' + d + "\nTo book and look for more details visit: ```" + mmtFlightUrl + '```'
-                                            ' would you like me to configure a trip for you?';
+                                            let custom_flight_response = "Here are some details:\n" + 'Uh Oh! There are not many fast flights for your query on date: ' + d + "\nTo book and look for more details visit: ```" + mmtFlightUrl + '```' +
+                                                ' would you like me to configure a trip for you?';
 
                                             let responseObject = {
                                                 "fulfillmentText": "",
