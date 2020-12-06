@@ -5,13 +5,32 @@ var cheerio = require('cheerio');
 const app = express();
 app.use(bodyParser());
 const weatherAPIKey = "2a8b9265f132bb94031535187640dee1";
-const airportCodeAPIKey = "4551947040";
-const airportCodeSecret = "bd0eb0bd08d16fd";
+const airportCodeAPIKey = "419a7900b2";
+const airportCodeSecret = "8dc38c00c1296ec";
+// const vision = require('@google-cloud/vision');
+
+// Creates a client
+// const client = new vision.ImageAnnotatorClient({
+//     keyFilename: 'trevokey.json'
+// });
+
+// const fileName = './moscow.jpeg';
+
+// client.landmarkDetection(fileName).then(result => {
+//     const landmarks = result.landmarkAnnotations;
+//     console.log('Landmarks:');
+//     landmarks.forEach(landmark => console.log(landmark));
+// });
+
+
 
 
 app.get('/', (req, res) => {
     res.send("Trevo Server");
 });
+
+
+
 
 app.get('/attractions/:id', (req, res) => {
     res.setHeader('Content-type', 'application/json');
@@ -52,7 +71,7 @@ app.get('/attractions/:id', (req, res) => {
                 });
                 res.send({ 'totalCount': placesList.length, 'cityName': queryCityName, 'places': placesList });
             }).catch(err => {
-                res.send({ 'errorMessage': err });
+                res.status(400).send({ 'errorMessage': err });
             });
     }
 });
@@ -103,7 +122,7 @@ app.get('/hotels/:id', (req, res) => {
                 res.send({ 'totalCount': hotels.length, 'cityName': queryCityName, 'places': hotels });
 
             }).catch(err => {
-                res.send({ 'errorMessage': err });
+                res.status(400).send({ 'errorMessage': err });
             });
 
     }
@@ -199,7 +218,6 @@ app.post('/webhook', (req, res) => {
                                 let d = dl[0] + '/' + dl[1] + '/' + dl[2]
 
                                 let flightSchedulesApi = "https://api.flightstats.com/flex/schedules/rest/v1/json/from/" + fromCityCode + "/to/" + toCityCode + "/arriving/" + d + "?appId=0762d25d&appKey=7662340eba0c099522f827941ed712ac";
-                                console.log(flightSchedulesApi);
                                 axios.get(flightSchedulesApi)
                                     .then(scheduleRes => {
                                         try {
