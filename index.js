@@ -9,12 +9,11 @@ const airportCodeAPIKey = "419a7900b2";
 const airportCodeSecret = "8dc38c00c1296ec";
 // const vision = require('@google-cloud/vision');
 
-// Creates a client
 // const client = new vision.ImageAnnotatorClient({
-//     keyFilename: 'trevokey.json'
+//     keyFilename: 'vision.json'
 // });
 
-// const fileName = './moscow.jpeg';
+// const fileName = './taj.jpg';
 
 // client.landmarkDetection(fileName).then(result => {
 //     const landmarks = result.landmarkAnnotations;
@@ -218,57 +217,40 @@ app.post('/webhook', (req, res) => {
                                 let d = dl[0] + '/' + dl[1] + '/' + dl[2]
 
                                 let flightSchedulesApi = "https://api.flightstats.com/flex/schedules/rest/v1/json/from/" + fromCityCode + "/to/" + toCityCode + "/arriving/" + d + "?appId=0762d25d&appKey=7662340eba0c099522f827941ed712ac";
-                                axios.get(flightSchedulesApi)
-                                    .then(scheduleRes => {
-                                        try {
-                                            let scheduleBody = scheduleRes.data;
-                                            let carrierCode = scheduleBody.scheduledFlights[0].carrierFsCode;
-                                            let flightCode = scheduleBody.scheduledFlights[0].flightNumber;
-                                            let stops = scheduleBody.scheduledFlights[0].stops;
-                                            let allCarriers = scheduleBody.appendix.airlines;
-                                            let myCarrierName;
-                                            var k;
-                                            for (k = 0; k < allCarriers.length; k++) {
-                                                if (allCarriers[k].fs == carrierCode) {
-                                                    myCarrierName = allCarriers[k].name;
-                                                }
-                                            }
 
-                                            let custom_flight_response = "Here are some details:\nCarrier-" + myCarrierName + ", flightNumber-" + flightCode + " with " + stops + " stops is the fastest flight for date: " + d + "\nTo book and look for more details visit: ```" + mmtFlightUrl + '```' +
-                                                ', would you like me to configure a trip for you?';
-                                            console.log(custom_flight_response);
 
-                                            let responseObject = {
-                                                "fulfillmentText": "",
-                                                "fulfillmentMessages": [{ "text": { "text": [custom_flight_response] } }],
-                                                "source": "",
-                                            }
-                                            res.send(responseObject);
-                                        } catch (err) {
+                                let custom_flight_response = "Here are some details:\n" + 'I guess there are not many super fast flights for your query on date: ' + d + "\nTo book comfotable and affordable flightsand look for more details here: ```" + mmtFlightUrl + '```' +
+                                    ' would you like me to configure a trip for you?';
 
-                                            let custom_flight_response = "Here are some details:\n" + 'Uh Oh! There are not many fast flights for your query on date: ' + d + "\nTo book and look for more details visit: ```" + mmtFlightUrl + '```' +
-                                                ' would you like me to configure a trip for you?';
-
-                                            let responseObject = {
-                                                "fulfillmentText": "",
-                                                "fulfillmentMessages": [{ "text": { "text": [custom_flight_response] } }],
-                                                "source": "",
-                                            }
-                                            res.send(responseObject);
-                                        }
-                                    }).catch(err => {
-                                        let responseObject = {
-                                            "fulfillmentText": "",
-                                            "fulfillmentMessages": [{ "text": { "text": [err] } }],
-                                            "source": "",
-                                        }
-                                        console.log(err);
-
-                                        res.send(responseObject);
-                                    });
+                                let responseObject = {
+                                    "fulfillmentText": "",
+                                    "fulfillmentMessages": [{ "text": { "text": [custom_flight_response] } }],
+                                    "source": "",
+                                }
+                                res.send(responseObject);
                             }
+                        }).catch((err) => {
+                            var ul = 'https://www.makemytrip.com/flights/';
+                            let custom_flight_response = "Here are some details:\n" + 'I guess there are not many super fast flights for your query on date: ' + d + "\nTo book comfotable and affordable flightsand look for more details here: ```" + ul + '```' +
+                                ' would you like me to configure a trip for you?';
+                            let responseObject = {
+                                "fulfillmentText": "",
+                                "fulfillmentMessages": [{ "text": { "text": [custom_flight_response] } }],
+                                "source": "",
+                            }
+                            res.send(responseObject);
                         });
                     }
+                }).catch((er) => {
+                    var ul = 'https://www.makemytrip.com/flights/';
+                    let custom_flight_response = "Here are some details:\n" + 'I guess there are not many super fast flights for your query on date: ' + d + "\nTo book comfotable and affordable flightsand look for more details here: ```" + ul + '```' +
+                        ' would you like me to configure a trip for you?';
+                    let responseObject = {
+                        "fulfillmentText": "",
+                        "fulfillmentMessages": [{ "text": { "text": [custom_flight_response] } }],
+                        "source": "",
+                    }
+                    res.send(responseObject);
                 });
             }
         }
