@@ -175,83 +175,85 @@ app.post('/webhook', (req, res) => {
                 let dateList = date.split("T")[0].split("-");
                 var finalDate = dateList[2] + "/" + dateList[1] + "/" + dateList[0];
 
-                axios({
-                    method: 'post',
-                    url: fromCityCodeUrl,
-                    headers: {
-                        'APC-Auth': airportCodeAPIKey,
-                        'APC-Auth-Secret': airportCodeSecret
-                    }
-                }).then(result => {
-                    if (result.data.statusCode == 200) {
+                var ul = 'https://www.makemytrip.com/flights/';
+                let custom_flight_response = "Here are some details:\n" + 'I guess there are not many super fast flights for your flight from ' + fromCity + ' to' + toCity + ' on date: ' + finalDate + "\nTo book comfotable and affordable flightsand look for more details here: ```" + ul + '```' +
+                    ' would you like me to configure a trip for you?';
+                let responseObject = {
+                    "fulfillmentText": "",
+                    "fulfillmentMessages": [{ "text": { "text": [custom_flight_response] } }],
+                    "source": "",
+                }
+                res.send(responseObject);
 
-                        let plF = result.data.airports[0];
-                        var fromCityCode;
-                        if (plF.name.match(/All Airports$/)) {
-                            fromCityCode = result.data.airports[1].iata;
-                        } else {
-                            fromCityCode = result.data.airports[0].iata;
-                        }
+                // axios({
+                //     method: 'post',
+                //     url: fromCityCodeUrl,
+                //     headers: {
+                //         'APC-Auth': airportCodeAPIKey,
+                //         'APC-Auth-Secret': airportCodeSecret
+                //     }
+                // }).then(result => {
+                //     if (result.data.statusCode == 200) {
 
-                        axios({
-                            method: 'post',
-                            url: toCityCodeUrl,
-                            headers: {
-                                'APC-Auth': airportCodeAPIKey,
-                                'APC-Auth-Secret': airportCodeSecret
-                            }
-                        }).then(result2 => {
-                            if (result2.data.statusCode == 200) {
-                                let pl = result2.data.airports[0];
-                                var toCityCode;
-                                if (pl.name.match(/All Airports$/)) {
-                                    toCityCode = result2.data.airports[1].iata;
-                                } else {
-                                    toCityCode = result2.data.airports[0].iata;
-                                }
+                //         let plF = result.data.airports[0];
+                //         var fromCityCode;
+                //         if (plF.name.match(/All Airports$/)) {
+                //             fromCityCode = result.data.airports[1].iata;
+                //         } else {
+                //             fromCityCode = result.data.airports[0].iata;
+                //         }
+
+                //         axios({
+                //             method: 'post',
+                //             url: toCityCodeUrl,
+                //             headers: {
+                //                 'APC-Auth': airportCodeAPIKey,
+                //                 'APC-Auth-Secret': airportCodeSecret
+                //             }
+                //         }).then(result2 => {
+                //             if (result2.data.statusCode == 200) {
+                //                 let pl = result2.data.airports[0];
+                //                 var toCityCode;
+                //                 if (pl.name.match(/All Airports$/)) {
+                //                     toCityCode = result2.data.airports[1].iata;
+                //                 } else {
+                //                     toCityCode = result2.data.airports[0].iata;
+                //                 }
 
 
-                                let flightQuery = fromCityCode + "-" + toCityCode + "-" + finalDate;
-                                let mmtFlightUrl = "https://www.makemytrip.com/flight/search?itinerary=" + flightQuery + "&tripType=O&paxType=A-1_C-0_I-0&intl=false&cabinClass=E"
-                                let dl = date.split("T")[0].split("-");
-                                let d = dl[0] + '/' + dl[1] + '/' + dl[2]
+                //                 let flightQuery = fromCityCode + "-" + toCityCode + "-" + finalDate;
+                //                 let mmtFlightUrl = "https://www.makemytrip.com/flight/search?itinerary=" + flightQuery + "&tripType=O&paxType=A-1_C-0_I-0&intl=false&cabinClass=E"
+                //                 let dl = date.split("T")[0].split("-");
+                //                 let d = dl[0] + '/' + dl[1] + '/' + dl[2]
 
-                                let flightSchedulesApi = "https://api.flightstats.com/flex/schedules/rest/v1/json/from/" + fromCityCode + "/to/" + toCityCode + "/arriving/" + d + "?appId=0762d25d&appKey=7662340eba0c099522f827941ed712ac";
+                //                 let flightSchedulesApi = "https://api.flightstats.com/flex/schedules/rest/v1/json/from/" + fromCityCode + "/to/" + toCityCode + "/arriving/" + d + "?appId=0762d25d&appKey=7662340eba0c099522f827941ed712ac";
 
 
-                                let custom_flight_response = "Here are some details:\n" + 'I guess there are not many super fast flights for your query on date: ' + d + "\nTo book comfotable and affordable flightsand look for more details here: ```" + mmtFlightUrl + '```' +
-                                    ' would you like me to configure a trip for you?';
+                //                 let custom_flight_response = "Here are some details:\n" + 'I guess there are not many super fast flights for your query on date: ' + d + "\nTo book comfotable and affordable flightsand look for more details here: ```" + mmtFlightUrl + '```' +
+                //                     ' would you like me to configure a trip for you?';
 
-                                let responseObject = {
-                                    "fulfillmentText": "",
-                                    "fulfillmentMessages": [{ "text": { "text": [custom_flight_response] } }],
-                                    "source": "",
-                                }
-                                res.send(responseObject);
-                            }
-                        }).catch((err) => {
-                            var ul = 'https://www.makemytrip.com/flights/';
-                            let custom_flight_response = "Here are some details:\n" + 'I guess there are not many super fast flights for your query on date: ' + d + "\nTo book comfotable and affordable flightsand look for more details here: ```" + ul + '```' +
-                                ' would you like me to configure a trip for you?';
-                            let responseObject = {
-                                "fulfillmentText": "",
-                                "fulfillmentMessages": [{ "text": { "text": [custom_flight_response] } }],
-                                "source": "",
-                            }
-                            res.send(responseObject);
-                        });
-                    }
-                }).catch((er) => {
-                    var ul = 'https://www.makemytrip.com/flights/';
-                    let custom_flight_response = "Here are some details:\n" + 'I guess there are not many super fast flights for your query on date: ' + d + "\nTo book comfotable and affordable flightsand look for more details here: ```" + ul + '```' +
-                        ' would you like me to configure a trip for you?';
-                    let responseObject = {
-                        "fulfillmentText": "",
-                        "fulfillmentMessages": [{ "text": { "text": [custom_flight_response] } }],
-                        "source": "",
-                    }
-                    res.send(responseObject);
-                });
+                //                 let responseObject = {
+                //                     "fulfillmentText": "",
+                //                     "fulfillmentMessages": [{ "text": { "text": [custom_flight_response] } }],
+                //                     "source": "",
+                //                 }
+                //                 res.send(responseObject);
+                //             }
+                //         }).catch((err) => {
+                //             var ul = 'https://www.makemytrip.com/flights/';
+                //             let custom_flight_response = "Here are some details:\n" + 'I guess there are not many super fast flights for your query on date: ' + d + "\nTo book comfotable and affordable flightsand look for more details here: ```" + ul + '```' +
+                //                 ' would you like me to configure a trip for you?';
+                //             let responseObject = {
+                //                 "fulfillmentText": "",
+                //                 "fulfillmentMessages": [{ "text": { "text": [custom_flight_response] } }],
+                //                 "source": "",
+                //             }
+                //             res.send(responseObject);
+                //         });
+                //     }
+                // }).catch((er) => {
+
+                // });
             }
         }
     } else if (action == "final_response") {
